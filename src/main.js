@@ -1,6 +1,7 @@
 import { CanvasManager } from './canvas/CanvasManager.js';
 import { PropertyPanel } from './panels/PropertyPanel.js';
 import { LatexGenerator } from './latex/LatexGenerator.js';
+import { i18n } from './i18n.js';
 
 /**
  * Main Application Entry Point
@@ -51,6 +52,7 @@ class App {
     this.setupPosterSettings();
     this.setupHeaderButtons();
     this.setupBottomPanel();
+    this.setupLanguageToggle();
 
     // Initial zoom to fit
     setTimeout(() => {
@@ -60,6 +62,9 @@ class App {
 
     // Update LaTeX preview
     this.updateLatexPreview();
+
+    // Apply initial language
+    this.updateUILanguage();
   }
 
   setupToolbar() {
@@ -435,6 +440,58 @@ class App {
       toast.style.transform = 'translateX(100px)';
       setTimeout(() => toast.remove(), 300);
     }, 3000);
+  }
+
+  /**
+   * Setup language toggle button
+   */
+  setupLanguageToggle() {
+    const langBtn = document.getElementById('btnLangToggle');
+    const langLabel = document.getElementById('langLabel');
+
+    if (langBtn) {
+      langBtn.addEventListener('click', () => {
+        i18n.toggle();
+        this.updateUILanguage();
+      });
+    }
+
+    // Update label based on current language
+    if (langLabel) {
+      langLabel.textContent = i18n.getLang() === 'zh' ? 'EN' : '中';
+    }
+  }
+
+  /**
+   * Update all UI text based on current language
+   */
+  updateUILanguage() {
+    const langLabel = document.getElementById('langLabel');
+
+    // Update language label (shows what you'll switch TO)
+    if (langLabel) {
+      langLabel.textContent = i18n.getLang() === 'zh' ? 'EN' : '中';
+    }
+
+    // Update all elements with data-i18n attribute
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.dataset.i18n;
+      el.textContent = i18n.t(key);
+    });
+
+    // Update all elements with data-i18n-title attribute
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+      const key = el.dataset.i18nTitle;
+      el.title = i18n.t(key);
+    });
+
+    // Update document title
+    document.title = i18n.t('appTitle');
+
+    // Update layer list if there are elements
+    if (this.canvasManager && this.canvasManager.elements.length > 0) {
+      this.handleLayersChange(this.canvasManager.elements);
+    }
   }
 }
 

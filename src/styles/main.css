@@ -167,14 +167,22 @@ body {
 }
 
 .btn-icon {
-  padding: 8px;
+  padding: 8px 12px;
   background: transparent;
   color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .btn-icon:hover {
   background: var(--surface-1);
   color: var(--text-primary);
+}
+
+.btn-icon span {
+  font-size: 12px;
+  font-weight: 600;
 }
 
 /* ===================================

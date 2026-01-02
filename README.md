@@ -49,8 +49,8 @@ A **Canva-like visual editor** for creating LaTeX posters. Design your poster vi
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/latex-poster-editor.git
-cd latex-poster-editor
+git clone https://github.com/Avalas00/LaTeX_Poster_Editor.git
+cd LaTeX_Poster_Editor
 
 # Install dependencies
 npm install
