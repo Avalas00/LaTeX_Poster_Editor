@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LaTeX Poster Editor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <h1 class="logo">LaTeX Poster Editor</h1>
+      </div>
+      <div class="header-center">
+        <span class="document-name" contenteditable="true">Untitled Poster</span>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-secondary" id="btnClearCanvas">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"/>
+          </svg>
+          清除畫布
+        </button>
+        <button class="btn btn-primary" id="btnExportLatex">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+          </svg>
+          匯出 LaTeX
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+      <!-- Left Sidebar - Toolbar -->
+      <aside class="sidebar sidebar-left">
+        <div class="sidebar-section">
+          <h3 class="sidebar-title">元件</h3>
+          <div class="tool-grid">
+            <button class="tool-item" data-tool="text" title="文字框">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 7V4h16v3M9 20h6M12 4v16"/>
+              </svg>
+              <span>文字</span>
+            </button>
+            <button class="tool-item" data-tool="rect" title="矩形">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+              </svg>
+              <span>矩形</span>
+            </button>
+            <button class="tool-item" data-tool="image" title="圖片">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <path d="M21 15l-5-5L5 21"/>
+              </svg>
+              <span>圖片</span>
+            </button>
+            <button class="tool-item" data-tool="line" title="線條">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="19" x2="19" y2="5"/>
+              </svg>
+              <span>線條</span>
+            </button>
+          </div>
+        </div>
+        
+        <div class="sidebar-section">
+          <h3 class="sidebar-title">海報設定</h3>
+          <div class="setting-group">
+            <label>尺寸</label>
+            <select id="posterSize" class="input-select">
+              <option value="a0">A0 (841×1189 mm)</option>
+              <option value="a1">A1 (594×841 mm)</option>
+              <option value="a2">A2 (420×594 mm)</option>
+              <option value="custom">自訂</option>
+            </select>
+          </div>
+          <div class="setting-group" id="customSizeGroup" style="display: none;">
+            <label>寬度 (mm)</label>
+            <input type="number" id="posterWidth" class="input-text" value="841">
+            <label>高度 (mm)</label>
+            <input type="number" id="posterHeight" class="input-text" value="1189">
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3 class="sidebar-title">圖層</h3>
+          <div id="layerList" class="layer-list">
+            <!-- Layers will be added here dynamically -->
+            <div class="layer-empty">尚無元件</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Canvas Area -->
+      <main class="canvas-container">
+        <div class="canvas-wrapper" id="canvasWrapper">
+          <div class="canvas" id="canvas">
+            <!-- Elements will be added here -->
+          </div>
+        </div>
+        <div class="canvas-controls">
+          <button class="zoom-btn" id="zoomOut">−</button>
+          <span class="zoom-level" id="zoomLevel">100%</span>
+          <button class="zoom-btn" id="zoomIn">+</button>
+          <button class="zoom-btn" id="zoomFit">Fit</button>
+        </div>
+      </main>
+
+      <!-- Right Sidebar - Properties -->
+      <aside class="sidebar sidebar-right">
+        <div class="sidebar-section" id="propertiesPanel">
+          <h3 class="sidebar-title">屬性</h3>
+          <div class="properties-empty">
+            <p>選取元件以編輯屬性</p>
+          </div>
+        </div>
+
+        <!-- Position Info -->
+        <div class="sidebar-section" id="positionInfo" style="display: none;">
+          <h3 class="sidebar-title">位置與尺寸</h3>
+          <div class="position-grid">
+            <div class="position-item">
+              <label>X</label>
+              <input type="number" id="propX" class="input-text input-small">
+              <span class="unit">mm</span>
+            </div>
+            <div class="position-item">
+              <label>Y</label>
+              <input type="number" id="propY" class="input-text input-small">
+              <span class="unit">mm</span>
+            </div>
+            <div class="position-item">
+              <label>W</label>
+              <input type="number" id="propWidth" class="input-text input-small">
+              <span class="unit">mm</span>
+            </div>
+            <div class="position-item">
+              <label>H</label>
+              <input type="number" id="propHeight" class="input-text input-small">
+              <span class="unit">mm</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Bottom Panel - LaTeX Preview -->
+    <div class="bottom-panel" id="bottomPanel">
+      <div class="panel-header">
+        <h3>LaTeX 代碼</h3>
+        <div class="panel-actions">
+          <button class="btn btn-icon" id="btnCopyLatex" title="複製代碼">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2"/>
+              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+            </svg>
+          </button>
+          <button class="btn btn-icon" id="btnTogglePanel" title="展開/收起">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="18 15 12 9 6 15"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="panel-content">
+        <pre id="latexOutput"><code>% LaTeX 代碼將顯示在這裡</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
